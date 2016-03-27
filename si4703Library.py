@@ -106,7 +106,7 @@ class si4703Radio():
         
         #setup the GPIO variables
         self.i2c = smbus.SMBus(1)
-        self.GPIO.setmode(self.GPIO.BCM)
+        self.GPIO.setmode(GPIO.BCM)
         self.GPIO.setup(self.resetPin, GPIO.OUT)
         self.GPIO.setup(0, GPIO.OUT)
         self.GPIO.setwarnings(False)
@@ -216,42 +216,6 @@ class si4703Radio():
             else: # more group types later
                 pass
 
-    def si4703WriteRegisters(self):
-        # A write command automatically begins with register 0x02 so no need to send a write-to address
-        # First we send the 0x02 to 0x07 control registers
-        # In general, we should not write to registers 0x08 and 0x09
-        
-        # only need a list that holds 0x02 - 0x07: 6 words or 12 bytes
-        i2cWriteBytes = [0] * 12
-        #move the shadow copy into the write buffer
-        for i in range(0,6):
-            i2cWriteBytes[i*2], i2cWriteBytes[(i*2)+1] = divmod(self.si4703_registers[i+2], 0x100)
-
-        # the "address" of the SMBUS write command is not used on the si4703 - need to use the first byte
-        self.i2c.write_i2c_block_data(self.i2CAddr, i2cWriteBytes[0], i2cWriteBytes[1:11])
-     
-    
-    def si4703ReadRegisters(self):
-        #Read the entire register control set from 0x00 to 0x0F
-        numRegstersToRead = 16
-        i2cReadBytes = [0] * 32
-        
-        #Si4703 begins reading from register upper register of 0x0A and reads to 0x0F, then loops to 0x00.
-        # SMBus requires an "address" parameter even though the 4703 doesn't need one
-        # Need to send the current value of the upper byte of register 0x02 as command byte
-        cmdByte = self.si4703_registers[0x02] >> 8
-
-        i2cReadBytes = self.i2c.read_i2c_block_data(self.i2CAddr, cmdByte, 32)
-        regIndex = 0x0A
-        
-        #Remember, register 0x0A comes in first so we have to shuffle the array around a bit
-        for i in range(0,16):
-            self.si4703_registers[regIndex] = (i2cReadBytes[i*2] * 256) + i2cReadBytes[(i*2)+1]
-            regIndex += 1
-            if regIndex == 0x10:
-                regIndex = 0
-
-
     def si4703Init(self):
         # To get the Si4703 inito 2-wire mode, SEN needs to be high and SDIO needs to be low after a reset
         # The breakout board has SEN pulled high, but also has SDIO pulled high. Therefore, after a normal power up
@@ -303,3 +267,37 @@ class si4703Radio():
         self.si4703_registers[self.SI4703_POWERCFG] = 0x002A # Power down the IC
         self.si4703_registers[self.SI4703_SYSCONFIG1] = 0x0041 # Power down the IC
         self.si4703WriteRegisters() # Update
+
+    def si4703WriteRegisters(self):
+        # A write command automatically begins with register 0x02 so no need to send a write-to address
+        # First we send the 0x02 to 0x07 control registers
+        # In general, we should not write to registers 0x08 and 0x09
+        
+        # only need a list that holds 0x02 - 0x07: 6 words or 12 bytes
+        i2cWriteBytes = [0] * 12
+        #move the shadow copy into the write buffer
+        for i in range(0,6):
+            i2cWriteBytes[i*2], i2cWriteBytes[(i*2)+1] = divmod(self.si4703_registers[i+2], 0x100)
+
+        # the "address" of the SMBUS write command is not used on the si4703 - need to use the first byte
+        self.i2c.write_i2c_block_data(self.i2CAddr, i2cWriteBytes[0], i2cWriteBytes[1:11])
+
+    def si4703ReadRegisters(self):
+        #Read the entire register control set from 0x00 to 0x0F
+        numRegstersToRead = 16
+        i2cReadBytes = [0] * 32
+        
+        #Si4703 begins reading from register upper register of 0x0A and reads to 0x0F, then loops to 0x00.
+        # SMBus requires an "address" parameter even though the 4703 doesn't need one
+        # Need to send the current value of the upper byte of register 0x02 as command byte
+        cmdByte = self.si4703_registers[0x02] >> 8
+
+        i2cReadBytes = self.i2c.read_i2c_block_data(self.i2CAddr, cmdByte, 32)
+        regIndex = 0x0A
+        
+        #Remember, register 0x0A comes in first so we have to shuffle the array around a bit
+        for i in range(0,16):
+            self.si4703_registers[regIndex] = (i2cReadBytes[i*2] * 256) + i2cReadBytes[(i*2)+1]
+            regIndex += 1
+            if regIndex == 0x10:
+                regIndex = 0
