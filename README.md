@@ -43,6 +43,7 @@ radio.si4703SeekDown()
 radio.si4703GetVolume() - returns the volume (0-15)
 radio.si4703GetChannel() - returns the currently tuned channel (same format as channel above)
 radio.si4703ProcessRDS() - grabs the RDS data out of the buffer and parses group 0 and group 2.  Needs to run at least every 40ms to be effective.
+radio.si4703ClearRDSBuffers() - Clear the RDS buffers.  Required after a seek/tune to flush out the old station info.
 ```
 
 The library is currently configured for Europe FM - ToDo is add an option to switch.  For now you'll have to edit the library.
