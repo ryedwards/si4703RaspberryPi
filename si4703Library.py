@@ -216,7 +216,7 @@ class si4703Radio():
             else: # more group types later
                 pass
 
-    def si4703ClearRDSBuffers():
+    def si4703ClearRDSBuffers(self):
         self.si4703_rds_ps[:] = []
         self.si4703_rds_rt[:] = []
         
