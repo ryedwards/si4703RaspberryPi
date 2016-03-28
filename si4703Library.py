@@ -216,6 +216,10 @@ class si4703Radio():
             else: # more group types later
                 pass
 
+    def si4703ClearRDSBuffers():
+        self.si4703_rds_ps[:] = []
+        self.si4703_rds_rt[:] = []
+        
     def si4703Init(self):
         # To get the Si4703 inito 2-wire mode, SEN needs to be high and SDIO needs to be low after a reset
         # The breakout board has SEN pulled high, but also has SDIO pulled high. Therefore, after a normal power up
