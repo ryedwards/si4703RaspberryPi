@@ -112,7 +112,11 @@ def run_ui(stdscr: "curses._CursesWindow", radio: Si4703Radio) -> None:
 
         # ── Help bar ──────────────────────────────────────────────────────────
         help_str = " ←/→ seek   +/- vol   m mute   s mono   digits+Enter tune   q quit "
-        stdscr.addstr(height - 1, 0, help_str[:width].ljust(width), curses.A_REVERSE)
+        try:
+            stdscr.addstr(height - 1, 0, help_str[:width].ljust(width), curses.A_REVERSE)
+        except curses.error:
+            # Writing to the last cell can raise an error; it's safe to ignore
+            pass
 
         stdscr.refresh()
 
