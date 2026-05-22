@@ -1,0 +1,68 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "si4703"
+version = "2.0.0"
+description = "Python driver for the Silicon Labs Si4702/Si4703 FM radio receiver — Raspberry Pi"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Ryan Edwards", email = "ryan.edwards@gmail.com" }]
+keywords = ["si4703", "si4702", "fm", "radio", "raspberry-pi", "rds", "rbds", "i2c", "embedded"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Hardware",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "smbus2>=0.4",
+]
+
+[project.optional-dependencies]
+gpio = [
+    "RPi.GPIO>=0.7",
+]
+dev = [
+    "pytest>=7.0",
+    "black>=23.0",
+    "ruff>=0.1",
+    "mypy>=1.0",
+]
+
+[project.scripts]
+si4703 = "si4703.cli:main"
+
+[project.urls]
+Homepage     = "https://github.com/ryane/si4703RaspberryPi"
+Repository   = "https://github.com/ryane/si4703RaspberryPi"
+Issues       = "https://github.com/ryane/si4703RaspberryPi/issues"
+Changelog    = "https://github.com/ryane/si4703RaspberryPi/releases"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/si4703"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "ANN"]
+ignore = ["ANN101", "ANN102"]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
